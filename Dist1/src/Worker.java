@@ -26,6 +26,8 @@ public class Worker {
 	final static String DIAMETER="estimated_diameter";
 	final static String METERS="meters";
 	final static String MAX_DIAMETER_METERS="estimated_diameter_max";
+	final static String MISS_DISTANCE="miss_distance";
+	final static String ASTRONOMICAL="astronomical";
 	
 	public static void main(String[] args) throws ClientProtocolException, IOException, JSONException {
 
@@ -71,9 +73,13 @@ public class Worker {
 			return "GREEN";
 		if(astroide.getJSONArray(CLOSE_APPROACH).getJSONObject(0).getJSONObject(RELATIVE_VELOCITY).getDouble(KPS)>10 &&
 				astroide.getBoolean(HAZARDOUS) && 
-				astroide.getJSONObject(DIAMETER).getJSONObject(METERS).getDouble(MAX_DIAMETER_METERS)>200)
+				astroide.getJSONObject(DIAMETER).getJSONObject(METERS).getDouble(MAX_DIAMETER_METERS)<200)
 			return "YELLOW";
-
-		return "RED";
+		if(astroide.getJSONArray(CLOSE_APPROACH).getJSONObject(0).getJSONObject(RELATIVE_VELOCITY).getDouble(KPS)>10 &&
+				astroide.getBoolean(HAZARDOUS) && 
+				astroide.getJSONArray(CLOSE_APPROACH).getJSONObject(0).getJSONObject(MISS_DISTANCE).getDouble(ASTRONOMICAL)>0.3 && 
+				astroide.getJSONObject(DIAMETER).getJSONObject(METERS).getDouble(MAX_DIAMETER_METERS)>200)
+			return "RED";
+		return "GREEN";
 	}
 }
