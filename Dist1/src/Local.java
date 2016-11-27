@@ -23,15 +23,15 @@ public class Local {
 	public static void main(String[] args) throws IOException {
 		Credentials = new PropertiesCredentials(new FileInputStream(propertiesFilePath));
 		AmazonS3 s3client = new AmazonS3Client(Credentials);
-		String bucketName = "yoav-backet4";
+		String bucketName = "dsps1";
+		String fileName ="param.txt";
+		System.out.println("Crating Bucket if not exists");
 		s3client.createBucket(bucketName);
-		for (com.amazonaws.services.s3.model.Bucket bucket : s3client.listBuckets()) {
-			System.out.println(" - " + bucket.getName());
-		}
-		
-		String fileName ="yoav.txt";
+		System.out.println("Pushing param file into bucket");
 		s3client.putObject(new PutObjectRequest(bucketName, fileName, 
-				new File("/Users/yoavcohen/Documents/workspace/awstest/src/awstest/file.txt"))
+				new File("src/param.txt"))
 				.withCannedAcl(CannedAccessControlList.PublicRead));
-}
-}
+		
+		
+}}
+	
