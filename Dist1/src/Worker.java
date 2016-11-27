@@ -34,12 +34,18 @@ public class Worker {
 		String url = "https://api.nasa.gov/neo/rest/v1/feed?start_date=2015-09-07&end_date=2015-09-08&api_key=9hZ8Yyim2EC1ZrEs2XlySosrCTLXaVpqtQwo1SHJ";
 
 		LocalDate startDate=LocalDate.parse("2015-09-07");
+		LocalDate endDate=LocalDate.parse("2015-09-08");
 		
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpGet request = new HttpGet(url);
 
 		request.addHeader("User-Agent", "Dist1");
 		HttpResponse response = client.execute(request);
+		int counter=0;
+		while(response.getStatusLine().getStatusCode()!=200 && counter<10){
+			response = client.execute(request);
+			counter++;
+		}
 
 		BufferedReader rd = new BufferedReader(
 			new InputStreamReader(response.getEntity().getContent()));
@@ -53,17 +59,18 @@ public class Worker {
 		System.out.println(result);
 		final JSONObject json=new JSONObject(result.toString());
 		JSONObject near= json.getJSONObject(NEAR_EARTH_OBJECTS);
-		while(near!=null){
-			JSONArray arr=near.getJSONArray(startDate.toString());
-			for(int i=0;i<arr.length();i++){
-				JSONObject temp=arr.getJSONObject(i);
-				System.out.println("Astroide " + temp.getString(NAME));
-				String isHazard=determineAstroide(temp);
-				System.out.println(" " + isHazard);
+		while(!startDate.equals(endDate)){
+			JSONArray arr;
+			if(near.has(startDate.toString())){
+				arr = near.getJSONArray(startDate.toString());
+				for(int i=0;i<arr.length();i++){
+					JSONObject temp=arr.getJSONObject(i);
+					System.out.println("Astroide " + temp.getString(NAME));
+					String isHazard=determineAstroide(temp);
+					System.out.println(" " + isHazard);
+				}
 			}
 			startDate=startDate.plusDays(1);
-			if(!near.has(startDate.toString()))
-				near=null;
 		}		
 	}
 	
